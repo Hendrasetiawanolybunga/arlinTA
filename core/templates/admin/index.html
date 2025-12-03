@@ -76,32 +76,121 @@
 
 {% block content %}
 <div class="dashboard-container">
-    <h1 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 25px; margin-left: 15px;">Dashboard Produksi dan Pemesanan</h1>
+ 
     
-    <!-- Metric Cards -->
-    <div class="row equal-height">
-        <div class="col-md-3 col-equal">
-            <div class="metric-card card-success">
-                <div class="metric-value">{{ total_produk_jadi|intcomma }}</div>
-                <div class="metric-label">Total Produk Jadi (Stok)</div>
+    <!-- First Row: 2 Cards (Orders Needing Attention & Revenue) -->
+    <div class="row equal-height mb-3">
+        <!-- Pesanan Perlu Diproses -->
+        <div class="col-md-6">
+            {% with count=pesanan_perhatian_count %}
+            <a href="{% url 'admin:core_pemesanan_changelist' %}?status__in=Diproses,Dikirim" style="text-decoration: none;">
+                <div class="card shadow mb-4" 
+                     style="border-left: 5px solid {% if count > 0 %}red{% else %}#4e73df{% endif %}; background-color: {% if count > 0 %}rgba(255, 99, 71, 0.1){% else %}white{% endif %}; height: 100%;">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-{% if count > 0 %}danger{% else %}info{% endif %} text-uppercase mb-1">
+                                    PESANAN PERLU DIPROSES
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ count|intcomma }}
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endwith %}
+        </div>
+        
+        <!-- Total Pendapatan -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4 border-left-info" style="height: 100%; border-left: 5px solid #17a2b8;">
+                
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Pendapatan (Pemesanan Selesai)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                Rp {{ total_pendapatan|intcomma }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-3 col-equal">
-            <div class="metric-card card-info">
-                <div class="metric-value">{{ total_pelanggan|intcomma }}</div>
-                <div class="metric-label">Total Pelanggan</div>
+    </div>
+    
+    <!-- Second Row: 3 Cards (Products, Customers, Orders) -->
+    <div class="row equal-height mb-5">
+        <!-- Total Produk Jadi (Stok) -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4 border-left-success" style="height: 100%; border-left: 5px solid #28a745;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Produk Jadi (Stok)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_produk_jadi|intcomma }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-3 col-equal">
-            <div class="metric-card card-warning">
-                <div class="metric-value">{{ total_pemesanan|intcomma }}</div>
-                <div class="metric-label">Total Pemesanan</div>
+        
+        <!-- Total Pelanggan -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4 border-left-primary" style="height: 100%; border-left: 5px solid #007bff;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Pelanggan
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_pelanggan|intcomma }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-3 col-equal">
-            <div class="metric-card card-primary">
-                <div class="metric-value">Rp {{ total_pendapatan|intcomma }}</div>
-                <div class="metric-label">Total Pendapatan (Pemesanan Selesai)</div>
+        
+        <!-- Total Pemesanan -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4 border-left-warning" style="height: 100%; border-left: 5px solid #ffc107;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Pemesanan
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_pemesanan|intcomma }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -112,6 +201,52 @@
         <canvas id="revenueChart" width="400" height="140"></canvas>
     </div>
 </div>
+
+<!-- 2.2 Template Modal -->
+{% if stok_menipis_count > 0 %}
+<div class="modal fade" id="stockAlertModal" tabindex="-1" role="dialog" aria-labelledby="stockAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="stockAlertModalLabel"><i class="fas fa-box-open"></i> Peringatan Stok Menipis!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Terdapat <strong>{{ stok_menipis_count }}</strong> produk yang stoknya berada di bawah batas aman ({{ stok_aman_threshold }}). Harap segera lakukan penyesuaian atau pembelian bahan baku.</p>
+                
+                <a href="{% url 'admin:core_produk_changelist' %}?stok_menipis=ya" class="btn btn-sm btn-warning mb-3">Lihat Semua Produk Stok Menipis</a>
+
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr><th>Produk</th><th>Jenis</th><th>Stok</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for produk in produk_stok_menipis|slice:":5" %}
+                        <tr>
+                            <td>{{ produk.namaProduk }}</td>
+                            <td>{{ produk.jenisProduk }}</td>
+                            <td class="text-danger">{{ produk.stok }} {{ produk.satuan }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if stok_menipis_count > 5 %}
+                    <small>... dan {{ stok_menipis_count|add:"-5" }} lainnya.</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tampilkan modal secara otomatis saat dashboard dimuat
+    $(document).ready(function() {
+        $('#stockAlertModal').modal('show');
+    });
+</script>
+{% endif %}
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

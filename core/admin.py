@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.db.models import Sum
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe  # PENTING: Untuk merender HTML
 from django.urls import path
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from django.http import HttpResponse
+from django.contrib.admin import SimpleListFilter
 from datetime import timedelta, datetime
 from .models import Karyawan, Produk, Produksi, DetailProduksi, Pelanggan, Pemesanan, DetailPemesanan
 
@@ -41,55 +43,88 @@ class DetailProduksiInline(admin.TabularInline):
 
 @admin.register(Karyawan, site=custom_admin_site)
 class KaryawanAdmin(admin.ModelAdmin):
-    list_display = ('idKaryawan', 'nama', 'username', 'action_buttons')
+    list_display = ('idKaryawan', 'nama', 'username', 'aksi_ikon')  # Ganti kolom aksi lama dengan ini
     search_fields = ('nama', 'username')
     list_filter = ('nama',)
     ordering = ('idKaryawan',)
     
-    def action_buttons(self, obj):
-        return format_html(
-            '<a class="btn btn-primary btn-sm" href="/admin/core/karyawan/{}/change/">Edit</a>&nbsp;'
-            '<a class="btn btn-danger btn-sm" href="/admin/core/karyawan/{}/delete/">Delete</a>',
-            obj.pk, obj.pk
+    @admin.display(description='Aksi')
+    def aksi_ikon(self, obj):
+        # Asumsi: Menggunakan Font Awesome (fa)
+        edit_url = f"/admin/core/karyawan/{obj.pk}/change/"
+        delete_url = f"/admin/core/karyawan/{obj.pk}/delete/"
+        
+        # Style tombol agar sesuai dengan format Admin (warna/ukuran)
+        edit_btn = f'<a href="{edit_url}" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>'
+        delete_btn = f'<a href="{delete_url}" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash-alt"></i></a>'
+        
+        # Gunakan mark_safe untuk memastikan Django merender HTML
+        return mark_safe(f'{edit_btn} {delete_btn}')
+
+
+class StokMenipisFilter(SimpleListFilter):
+    title = 'Status Stok'
+    parameter_name = 'stok_menipis'
+    STOK_AMAN_THRESHOLD = 10  # Ambang batas stok menipis
+
+    def lookups(self, request, model_admin):
+        # Opsi yang muncul di filter sidebar
+        return (
+            ('ya', 'Stok Menipis'),
         )
-    action_buttons.short_description = 'Actions'
+
+    def queryset(self, request, queryset):
+        # Logika filtering: jika 'ya' dipilih, filter produk yang stoknya < threshold
+        if self.value() == 'ya':
+            return queryset.filter(stok__lt=self.STOK_AMAN_THRESHOLD)
+        return queryset
 
 
 @admin.register(Produk, site=custom_admin_site)
 class ProdukAdmin(admin.ModelAdmin):
-    list_display = ('idProduk', 'namaProduk', 'jenisProduk', 'formatted_harga', 'stok', 'satuan', 'action_buttons')
+    list_display = ('idProduk', 'namaProduk', 'jenisProduk', 'formatted_harga', 'stok', 'satuan', 'aksi_ikon')  # Ganti kolom aksi lama dengan ini
     search_fields = ('namaProduk',)
-    list_filter = ('jenisProduk',)
+    list_filter = ('jenisProduk', StokMenipisFilter)  # Tambahkan filter kustom di sini
     ordering = ('idProduk',)
     
     def formatted_harga(self, obj):
         return f"Rp {obj.harga:,}"
     formatted_harga.short_description = 'Harga'
     
-    def action_buttons(self, obj):
-        return format_html(
-            '<a class="btn btn-primary btn-sm" href="/admin/core/produk/{}/change/">Edit</a>&nbsp;'
-            '<a class="btn btn-danger btn-sm" href="/admin/core/produk/{}/delete/">Delete</a>',
-            obj.pk, obj.pk
-        )
-    action_buttons.short_description = 'Actions'
+    @admin.display(description='Aksi')
+    def aksi_ikon(self, obj):
+        # Asumsi: Menggunakan Font Awesome (fa)
+        edit_url = f"/admin/core/produk/{obj.pk}/change/"
+        delete_url = f"/admin/core/produk/{obj.pk}/delete/"
+        
+        # Style tombol agar sesuai dengan format Admin (warna/ukuran)
+        edit_btn = f'<a href="{edit_url}" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>'
+        delete_btn = f'<a href="{delete_url}" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash-alt"></i></a>'
+        
+        # Gunakan mark_safe untuk memastikan Django merender HTML
+        return mark_safe(f'{edit_btn} {delete_btn}')
 
 
 @admin.register(Produksi, site=custom_admin_site)
 class ProduksiAdmin(admin.ModelAdmin):
-    list_display = ('idProduksi', 'tanggalProduksi', 'jenisHasil', 'jumlahHasil', 'idKaryawan', 'action_buttons')
+    list_display = ('idProduksi', 'tanggalProduksi', 'jenisHasil', 'jumlahHasil', 'idKaryawan', 'aksi_ikon')  # Ganti kolom aksi lama dengan ini
     search_fields = ('jenisHasil',)
     list_filter = ('tanggalProduksi', 'jenisHasil', 'idKaryawan')
     ordering = ('-tanggalProduksi',)
     inlines = [DetailProduksiInline]
     
-    def action_buttons(self, obj):
-        return format_html(
-            '<a class="btn btn-primary btn-sm" href="/admin/core/produksi/{}/change/">Edit</a>&nbsp;'
-            '<a class="btn btn-danger btn-sm" href="/admin/core/produksi/{}/delete/">Delete</a>',
-            obj.pk, obj.pk
-        )
-    action_buttons.short_description = 'Actions'
+    @admin.display(description='Aksi')
+    def aksi_ikon(self, obj):
+        # Asumsi: Menggunakan Font Awesome (fa)
+        edit_url = f"/admin/core/produksi/{obj.pk}/change/"
+        delete_url = f"/admin/core/produksi/{obj.pk}/delete/"
+        
+        # Style tombol agar sesuai dengan format Admin (warna/ukuran)
+        edit_btn = f'<a href="{edit_url}" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>'
+        delete_btn = f'<a href="{delete_url}" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash-alt"></i></a>'
+        
+        # Gunakan mark_safe untuk memastikan Django merender HTML
+        return mark_safe(f'{edit_btn} {delete_btn}')
 
 
 class DetailPemesananInline(admin.TabularInline):
@@ -100,23 +135,28 @@ class DetailPemesananInline(admin.TabularInline):
 
 @admin.register(Pelanggan, site=custom_admin_site)
 class PelangganAdmin(admin.ModelAdmin):
-    list_display = ('idPelanggan', 'namaPelanggan', 'alamat', 'noTelp', 'username', 'action_buttons')
+    list_display = ('idPelanggan', 'namaPelanggan', 'alamat', 'noTelp', 'username', 'aksi_ikon')  # Ganti kolom aksi lama dengan ini
     search_fields = ('namaPelanggan', 'username')
     list_filter = ('namaPelanggan',)
     ordering = ('idPelanggan',)
     
-    def action_buttons(self, obj):
-        return format_html(
-            '<a class="btn btn-primary btn-sm" href="/admin/core/pelanggan/{}/change/">Edit</a>&nbsp;'
-            '<a class="btn btn-danger btn-sm" href="/admin/core/pelanggan/{}/delete/">Delete</a>',
-            obj.pk, obj.pk
-        )
-    action_buttons.short_description = 'Actions'
+    @admin.display(description='Aksi')
+    def aksi_ikon(self, obj):
+        # Asumsi: Menggunakan Font Awesome (fa)
+        edit_url = f"/admin/core/pelanggan/{obj.pk}/change/"
+        delete_url = f"/admin/core/pelanggan/{obj.pk}/delete/"
+        
+        # Style tombol agar sesuai dengan format Admin (warna/ukuran)
+        edit_btn = f'<a href="{edit_url}" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>'
+        delete_btn = f'<a href="{delete_url}" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash-alt"></i></a>'
+        
+        # Gunakan mark_safe untuk memastikan Django merender HTML
+        return mark_safe(f'{edit_btn} {delete_btn}')
 
 
 @admin.register(Pemesanan, site=custom_admin_site)
 class PemesananAdmin(admin.ModelAdmin):
-    list_display = ('idPemesanan', 'tanggalPemesanan', 'formatted_totalPemesanan', 'idPelanggan', 'status', 'action_buttons')
+    list_display = ( 'tanggalPemesanan', 'formatted_totalPemesanan', 'idPelanggan', 'status', 'aksi_ikon')  # Ganti kolom aksi lama dengan ini
     search_fields = ('idPelanggan__namaPelanggan',)
     list_filter = ('tanggalPemesanan', 'idPelanggan', 'status')
     ordering = ('-tanggalPemesanan',)
@@ -130,13 +170,18 @@ class PemesananAdmin(admin.ModelAdmin):
         return f"Rp {obj.totalPemesanan:,}"
     formatted_totalPemesanan.short_description = 'Total Pemesanan'
     
-    def action_buttons(self, obj):
-        return format_html(
-            '<a class="btn btn-primary btn-sm" href="/admin/core/pemesanan/{}/change/">Edit</a>&nbsp;'
-            '<a class="btn btn-danger btn-sm" href="/admin/core/pemesanan/{}/delete/">Delete</a>',
-            obj.pk, obj.pk
-        )
-    action_buttons.short_description = 'Actions'
+    @admin.display(description='Aksi')
+    def aksi_ikon(self, obj):
+        # Asumsi: Menggunakan Font Awesome (fa)
+        edit_url = f"/admin/core/pemesanan/{obj.pk}/change/"
+        delete_url = f"/admin/core/pemesanan/{obj.pk}/delete/"
+        
+        # Style tombol agar sesuai dengan format Admin (warna/ukuran)
+        edit_btn = f'<a href="{edit_url}" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>'
+        delete_btn = f'<a href="{delete_url}" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash-alt"></i></a>'
+        
+        # Gunakan mark_safe untuk memastikan Django merender HTML
+        return mark_safe(f'{edit_btn} {delete_btn}')
     
     def save_model(self, request, obj, form, change):
         # Get the old status if this is an update
@@ -582,6 +627,15 @@ def admin_dashboard_context():
         total=Sum('totalPemesanan')
     )['total'] or 0
     
+    # 1. Hitung Pesanan yang Membutuhkan Perhatian:
+    # Status yang dihitung: 'Diproses' dan 'Dikirim'
+    ATTENTION_STATUSES = ['Diproses', 'Dikirim']
+    pesanan_perhatian_count = Pemesanan.objects.filter(status__in=ATTENTION_STATUSES).count()
+    
+    # 2.1 Logika Stok Menipis
+    STOK_AMAN_THRESHOLD = 10 
+    produk_stok_menipis = Produk.objects.filter(stok__lt=STOK_AMAN_THRESHOLD).order_by('namaProduk')
+    
     # Calculate monthly revenue for the last 6 months (only completed orders)
     today = timezone.now().date()
     monthly_revenue = []
@@ -607,6 +661,12 @@ def admin_dashboard_context():
         'total_pendapatan': total_pendapatan,
         'monthly_revenue': monthly_revenue,
         'labels': labels,
+        # 2. Tambahkan ke context (untuk card dan template index.html):
+        'pesanan_perhatian_count': pesanan_perhatian_count,
+        # 2.1 Logika Stok Menipis
+        'produk_stok_menipis': produk_stok_menipis,
+        'stok_menipis_count': produk_stok_menipis.count(),
+        'stok_aman_threshold': STOK_AMAN_THRESHOLD
     }
     
     return context
@@ -623,3 +683,11 @@ def custom_index(self, request, extra_context=None):
 
 # Apply the monkey patch
 CustomAdminSite.index = custom_index
+
+
+# Jazzmin Customization
+def get_pesanan_perhatian_count(request):
+    ATTENTION_STATUSES = ['Diproses', 'Dikirim']
+    # Memastikan fungsi dapat diakses oleh Jazzmin
+    return Pemesanan.objects.filter(status__in=ATTENTION_STATUSES).count()
+

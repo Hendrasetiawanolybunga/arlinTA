@@ -165,6 +165,38 @@ JAZZMIN_SETTINGS = {
             'url': 'admin:index',
             'icon': 'fa fa-home',
         },
+        {
+            'app': 'core',
+            'model': 'pemesanan',
+            'name': 'Pemesanan',
+            'icon': 'fas fa-shopping-cart',
+            # Menambahkan badge kustom:
+            'badge': 'core.admin.get_pesanan_perhatian_count', # PATH HARUS TEPAT
+        },
+        {
+            'app': 'core',
+            'model': 'pelanggan',
+            'name': 'Pelanggan',
+            'icon': 'fas fa-user',
+        },
+        {
+            'app': 'core',
+            'model': 'karyawan',
+            'name': 'Karyawan',
+            'icon': 'fas fa-box',
+        },
+        {
+            'app': 'core',
+            'model': 'produk',
+            'name': 'Produk',
+            'icon': 'fas fa-box',
+        },
+        {
+            'app': 'core',
+            'model': 'produksi',
+            'name': 'Produksi',
+            'icon': 'fas fa-handshake',
+        },
     ],
 
      "icons": {
