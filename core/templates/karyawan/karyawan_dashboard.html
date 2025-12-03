@@ -1,0 +1,267 @@
+{% extends 'karyawan/karyawan_base.html' %}
+
+{% block title %}Dashboard Karyawan{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4 fw-bold">
+            <i class="fas fa-user"></i> Dashboard Karyawan - {{ karyawan.nama }}
+        </h2>
+    </div>
+</div>
+
+<!-- Metrics Cards -->
+<div class="row mb-4">
+    <div class="col-6 col-md-4 mb-3">
+        <div class="card card-custom metric-card h-100 shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title fw-semibold text-muted">Total Produksi</h6>
+                        <h2 class="fw-bold text-dark">{{ total_productions }}</h2>
+                    </div>
+                    <div class="icon-circle bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; min-width: 50px;">
+                        <i class="fas fa-industry fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-6 col-md-4 mb-3">
+        <div class="card card-custom h-100 shadow" style="border-left-color: #007bff;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title fw-semibold text-muted">Produksi Tahu</h6>
+                        <h2 class="fw-bold text-dark">{{ total_tahu }}</h2>
+                    </div>
+                    <div class="icon-circle bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; min-width: 50px;">
+                        <i class="fas fa-cheese fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-6 col-md-4 mb-3">
+        <div class="card card-custom production-card h-100 shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title fw-semibold text-muted">Produksi Tempe</h6>
+                        <h2 class="fw-bold text-dark">{{ total_tempe }}</h2>
+                    </div>
+                    <div class="icon-circle bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; min-width: 50px;">
+                        <i class="fas fa-seedling fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Button -->
+<div class="row mb-4">
+    <div class="col-12">
+        <button type="button" class="btn btn-primary btn-custom" data-bs-toggle="modal" data-bs-target="#inputProduksiModal">
+            <i class="fas fa-plus me-2"></i> Input Produksi Baru
+        </button>
+    </div>
+</div>
+
+<!-- Recent Productions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-custom shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i> Riwayat Produksi Terbaru</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_productions %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Hasil</th>
+                                <th>Jumlah</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produksi in recent_productions %}
+                            <tr>
+                                <td>{{ produksi.tanggalProduksi|date:"d M Y" }}</td>
+                                <td>{{ produksi.jenisHasil }}</td>
+                                <td>{{ produksi.jumlahHasil }} {{ produksi.satuanHasil }}</td>
+                                <td>{{ produksi.keterangan|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Belum ada data produksi.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Input Produksi Modal -->
+<div class="modal fade" id="inputProduksiModal" tabindex="-1" aria-labelledby="inputProduksiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="inputProduksiModalLabel">
+                    <i class="fas fa-industry me-2"></i> Input Produksi Baru
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'core:karyawan_produksi_input' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Produksi Info -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tanggalProduksi" class="form-label fw-medium">Tanggal Produksi</label>
+                            <input type="date" class="form-control" id="tanggalProduksi" name="tanggalProduksi" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="jenisHasil" class="form-label fw-medium">Jenis Hasil</label>
+                            <select class="form-select" id="jenisHasil" name="jenisHasil" required>
+                                <option value="">Pilih Jenis</option>
+                                <option value="Tahu">Tahu</option>
+                                <option value="Tempe">Tempe</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="jumlahHasil" class="form-label fw-medium">Jumlah Hasil</label>
+                            <input type="number" class="form-control" id="jumlahHasil" name="jumlahHasil" min="1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="satuanHasil" class="form-label fw-medium">Satuan</label>
+                            <select class="form-select" id="satuanHasil" name="satuanHasil" required>
+                                <option value="">Pilih Satuan</option>
+                                <option value="buah">Buah</option>
+                                <option value="kg">Kg</option>
+                                <option value="bungkus">Bungkus</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="keterangan" class="form-label fw-medium">Keterangan</label>
+                        <textarea class="form-control" id="keterangan" name="keterangan" rows="2"></textarea>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Detail Produksi (Bahan Baku) -->
+                    <h6 class="fw-bold"><i class="fas fa-boxes me-2"></i> Bahan Baku Terpakai</h6>
+                    <div id="detail-produksi-container">
+                        <div class="detail-produksi-row row mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Bahan Baku</label>
+                                <select class="form-select" name="idProduk[]">
+                                    <option value="">Pilih Bahan Baku</option>
+                                    {% for bahan in bahan_baku %}
+                                    <option value="{{ bahan.idProduk }}">{{ bahan.namaProduk }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-medium">Jumlah Terpakai</label>
+                                <input type="number" class="form-control" name="jumlahBahanTerpakai[]" min="1">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger remove-detail-btn" disabled>
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-secondary btn-sm" id="add-detail-btn">
+                        <i class="fas fa-plus me-1"></i> Tambah Bahan Baku
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-custom">
+                        <i class="fas fa-save me-1"></i> Simpan Produksi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set today's date as default
+    document.getElementById('tanggalProduksi').valueAsDate = new Date();
+    
+    // Add detail produksi row
+    document.getElementById('add-detail-btn').addEventListener('click', function() {
+        const container = document.getElementById('detail-produksi-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'detail-produksi-row row mb-2';
+        newRow.innerHTML = `
+            <div class="col-md-6">
+                <select class="form-select" name="idProduk[]">
+                    <option value="">Pilih Bahan Baku</option>
+                    {% for bahan in bahan_baku %}
+                    <option value="{{ bahan.idProduk }}">{{ bahan.namaProduk }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="jumlahBahanTerpakai[]" min="1" placeholder="Jumlah">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-danger remove-detail-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(newRow);
+        
+        // Enable remove button for all rows except the first one
+        const removeButtons = container.querySelectorAll('.remove-detail-btn');
+        if (removeButtons.length > 1) {
+            removeButtons.forEach(btn => {
+                btn.disabled = false;
+            });
+        }
+    });
+    
+    // Remove detail produksi row
+    document.getElementById('detail-produksi-container').addEventListener('click', function(e) {
+        if (e.target.closest('.remove-detail-btn')) {
+            const button = e.target.closest('.remove-detail-btn');
+            const row = button.closest('.detail-produksi-row');
+            
+            // Make sure we don't remove the last row
+            const totalRows = document.querySelectorAll('.detail-produksi-row').length;
+            if (totalRows > 1) {
+                row.remove();
+                
+                // Disable remove button if only one row left
+                const removeButtons = document.querySelectorAll('.remove-detail-btn');
+                if (removeButtons.length === 1) {
+                    removeButtons[0].disabled = true;
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

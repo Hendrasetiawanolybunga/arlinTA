@@ -128,14 +128,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 JAZZMIN_SETTINGS = {
-    'site_title': 'MICKEL PRODUCT ',
-    'site_header': 'MICKEL PRODUCT',
-    'site_brand': 'MICKEL PRODUCT ',
+    'site_title': 'Mayckel Product ',
+    'site_header': 'Mayckel Product',
+    'site_brand': 'Mayckel Product ',
     'site_logo_classes': 'img-circle',
-    'site_logo_alt': 'MICKEL PRODUCT  ',
+    'site_logo_alt': 'Mayckel Product  ',
     'welcome_sign': 'Selamat Datang',
-    'copyright': '2023 MICKEL PRODUCT ',
-    'footer_text': 'MICKEL PRODUCT',
+    'copyright': '2023 Mayckel Product ',
+    'footer_text': 'Mayckel Product',
     'topmenu_links': [
         {
             'name': 'Home',

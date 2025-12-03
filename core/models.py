@@ -98,7 +98,8 @@ class Produksi(models.Model):
             )
             
         # Adjust stock based on the difference
-        stock_difference = self.jumlahHasil - old_jumlah
+        # Convert to int to ensure proper arithmetic
+        stock_difference = int(self.jumlahHasil) - int(old_jumlah)
         produk.stok += stock_difference
         produk.save()
 
@@ -126,7 +127,8 @@ class DetailProduksi(models.Model):
             old_jumlah = DetailProduksi.objects.get(pk=self.pk).jumlahBahanTerpakai
             
         # Hitung stok yang akan digunakan/berubah
-        stok_yang_dibutuhkan = self.jumlahBahanTerpakai - old_jumlah
+        # Convert to int to ensure proper arithmetic
+        stok_yang_dibutuhkan = int(self.jumlahBahanTerpakai) - int(old_jumlah)
         
         # Cek hanya jika produk adalah Bahan Baku
         if self.idProduk.jenisProduk == 'Bahan Baku':
@@ -152,7 +154,8 @@ class DetailProduksi(models.Model):
         super().save(*args, **kwargs)
         
         # Adjust stock based on the difference
-        stock_difference = self.jumlahBahanTerpakai - old_jumlah
+        # Convert to int to ensure proper arithmetic
+        stock_difference = int(self.jumlahBahanTerpakai) - int(old_jumlah)
         
         # Reduce stock of raw materials
         if self.idProduk.jenisProduk == 'Bahan Baku':

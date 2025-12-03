@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Karyawan Dashboard{% endblock %}</title>
+    <!-- Poppins Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar-custom {
+            background-color: #ffffff;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: #007bff !important;
+        }
+        .nav-link {
+            color: #495057 !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #007bff !important;
+        }
+        .main-content {
+            padding: 15px 30px;
+        }
+        .card-custom {
+            border-left: 4px solid #007bff;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: transform 0.3s ease;
+        }
+        .card-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .metric-card {
+            border-left: 4px solid #28a745;
+        }
+        .production-card {
+            border-left: 4px solid #ffc107;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .user-menu {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+        }
+        
+        /* 2. Responsivitas Font & Elemen (Agresif untuk Mobile) */
+        @media (max-width: 767.98px) { /* Small devices (mobile) */
+            h1, h2, .h5 {
+                font-size: 1.25rem !important; /* Mengecilkan heading */
+            }
+            .card .h5 {
+                font-size: 1rem !important; /* Nilai angka di card dikecilkan */
+            }
+            .card-body {
+                padding: 10px !important; /* Padding Card lebih kecil */
+            }
+            .btn {
+                padding: .375rem .75rem !important; /* Ukuran tombol lebih kecil */
+                font-size: .875rem !important;
+            }
+            /* Teks detail (Riwayat Produksi) juga dikecilkan */
+            .table td, .table th {
+                 padding: .5rem !important;
+                 font-size: .8rem;
+            }
+            .main-content {
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            .dropdown-menu {
+                min-width: 150px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'core:karyawan_dashboard' %}">
+                <i class="fas fa-industry"></i> Mayckel Product
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if request.session.karyawan_id %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> {{ request.session.karyawan_nama }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#akunModal"><i class="fas fa-id-card"></i> Akun Saya</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'core:karyawan_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4">
+        {% if messages %}
+        <div class="row">
+            <div class="col-12">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Akun Modal -->
+    {% if request.session.karyawan_id %}
+    <div class="modal fade" id="akunModal" tabindex="-1" aria-labelledby="akunModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="akunModalLabel">Detail Akun Karyawan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nama:</strong> {{ request.session.karyawan_nama }}</p>
+                    <p><strong>Username:</strong> {{ karyawan.username }}</p>
+                    <p><strong>Posisi:</strong> {{ karyawan.posisi|default:"-" }}</p>
+                    <small class="text-muted">Untuk perubahan data yang lebih sensitif, hubungi Administrator.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

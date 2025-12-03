@@ -21,4 +21,10 @@ urlpatterns = [
     path('admin/report/penjualan/pdf/', report_penjualan_pdf, name='report_penjualan_pdf'),
     path('admin/report/produk/pdf/', report_produk_pdf, name='report_produk_pdf'),
     path('admin/report/produksi/pdf/', report_produksi_pdf, name='report_produksi_pdf'),
+    
+    # Karyawan URLs
+    path('karyawan/login/', views.karyawan_login, name='karyawan_login'),
+    path('karyawan/logout/', views.karyawan_logout, name='karyawan_logout'),
+    path('karyawan/dashboard/', views.karyawan_dashboard, name='karyawan_dashboard'),
+    path('karyawan/produksi/input/', views.karyawan_produksi_input, name='karyawan_produksi_input'),
 ]
