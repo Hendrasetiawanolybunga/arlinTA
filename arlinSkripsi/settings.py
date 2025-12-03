@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'core',
 ]
 
@@ -49,7 +50,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'arlinSkripsi.urls'
@@ -139,15 +139,30 @@ JAZZMIN_SETTINGS = {
     'topmenu_links': [
         {
             'name': 'Home',
-            'url': '',
+            'url': 'admin:index',
             'icon': 'fa fa-home',
+        },
+        {
+            'name': 'Laporan Penjualan',
+            'url': 'core:filter_penjualan',
+            'icon': 'fas fa-file-invoice-dollar'
+        },
+        {
+            'name': 'Laporan Produk',
+            'url': 'core:filter_produk',
+            'icon': 'fas fa-boxes'
+        },
+        {
+            'name': 'Laporan Produksi',
+            'url': 'core:filter_produksi',
+            'icon': 'fas fa-industry'
         },
     ],
     'menubar_show': True,
     'menu': [
         {
             'name': 'Home',
-            'url': '',
+            'url': 'admin:index',
             'icon': 'fa fa-home',
         },
     ],
@@ -161,10 +176,8 @@ JAZZMIN_SETTINGS = {
         "core.Karyawan": "fas fa-box",
         "core.Produksi": "fas fa-handshake",
         "core.Produk": "fas fa-box",
-        "core.Pembelian": "fas fa-shopping-cart",
-        "core.Penjualan": "fas fa-receipt",
-        "core.DetailPembelian": "fas fa-shopping-cart",
-        "core.DetailPenjualan": "fas fa-receipt",
+        "core.Pemesanan": "fas fa-shopping-cart",
+       
     },
 
 
@@ -174,10 +187,8 @@ JAZZMIN_SETTINGS = {
         "core.Pelanggan",
         "core.Produk",
         "core.Produksi",
-        "core.Pembelian",
-        "core.Penjualan",
-        "core.DetailPembelian",
-        "core.DetailPenjualan",
+        "core.Pemesanan",
+        "core.DetailPemesanan",
     ],
 
     'show_ui_builder':True,

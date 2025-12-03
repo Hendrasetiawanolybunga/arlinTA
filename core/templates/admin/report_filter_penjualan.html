@@ -1,0 +1,166 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ title }}{% endblock %}
+
+
+
+{% block content %}
+<div class="container-fluid" style="max-width: 100% !important; width: 100% !important; padding-left: 0 !important; padding-right: 0 !important;">
+    <div style="padding-left: 15px; padding-right: 15px;">
+        <div class="module">
+            <h1>Filter Laporan Penjualan</h1>
+            
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="date_from">Tanggal Mulai:</label>
+                        <input type="date" id="date_from" name="date_from" class="form-control" value="{{ submitted_filters.date_from|default:'' }}">
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="date_to">Tanggal Selesai:</label>
+                        <input type="date" id="date_to" name="date_to" class="form-control" value="{{ submitted_filters.date_to|default:'' }}">
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="status">Status Pemesanan:</label>
+                        <select id="status" name="status" class="form-control">
+                            <option value="">Semua Status</option>
+                            {% for choice in status_choices %}
+                            <option value="{{ choice.0 }}" {% if submitted_filters.status == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary mr-2" style="height: fit-content;">Tampilkan Data</button>
+                        <a href="{% url 'admin:index' %}" class="btn btn-secondary" style="height: fit-content;"><i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </form>
+            
+            {% if filtered_data %}
+            <hr>
+            <h3>Data Preview ({{ filtered_data.count }} Hasil Ditemukan)</h3>
+            
+            <form method="GET" action="{% url 'core:report_penjualan_pdf' %}" style="display:inline;">
+                {% for key, value in submitted_filters.items %}
+                    {% if key != 'csrfmiddlewaretoken' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+                <button type="submit" class="btn btn-success mb-3">
+                    <i class="fas fa-print"></i> Cetak PDF
+                </button>
+            </form>
+            
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tanggal</th>
+                        <th>Pelanggan</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pemesanan in filtered_data %}
+                    <tr>
+                        <td>{{ pemesanan.idPemesanan }}</td>
+                        <td>{{ pemesanan.tanggalPemesanan|date:"d M Y" }}</td>
+                        <td>{{ pemesanan.idPelanggan.namaPelanggan }}</td>
+                        <td>{{ pemesanan.status }}</td>
+                        <td>Rp {{ pemesanan.totalPemesanan|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    
+    .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.75rem;
+        vertical-align: top;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table-bordered {
+        border: 1px solid #dee2e6;
+    }
+    
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #dee2e6;
+    }
+    
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .mr-2 {
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}

@@ -3,7 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Sum
-from .models import Produk, Pelanggan, Pembelian, Penjualan
+from .models import Produk, Pelanggan, Pemesanan
 from .admin import admin_dashboard_context
 
 
