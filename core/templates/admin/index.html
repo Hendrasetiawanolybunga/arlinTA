@@ -1,0 +1,100 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .metric-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+    }
+    .metric-label {
+        font-size: 1rem;
+        color: #666;
+    }
+    .chart-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="module">
+    <h1>Production and Sales Dashboard</h1>
+    
+    <!-- Metric Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ total_produk_jadi }}</div>
+                <div class="metric-label">Total Finished Products (Stock)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ total_pelanggan }}</div>
+                <div class="metric-label">Total Customers</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">{{ total_pembelian }}</div>
+                <div class="metric-label">Total Purchases (Raw Materials)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-value">Rp {{ total_pendapatan }}</div>
+                <div class="metric-label">Total Revenue (Sales)</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart -->
+    <div class="chart-container">
+        <h2>Monthly Revenue (Last 6 Months)</h2>
+        <canvas id="revenueChart" width="400" height="200"></canvas>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [{
+                    label: 'Revenue (Rp)',
+                    data: {{ monthly_revenue }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
+from django.db.models import Sum
 
 # Create your models here.
 
@@ -96,11 +97,7 @@ class Produksi(models.Model):
             )
             
         # Adjust stock based on the difference
-        if is_update:
-            stock_difference = self.jumlahHasil - old_jumlah
-        else:
-            stock_difference = self.jumlahHasil
-            
+        stock_difference = self.jumlahHasil - old_jumlah
         produk.stok += stock_difference
         produk.save()
 
@@ -122,11 +119,23 @@ class DetailProduksi(models.Model):
         verbose_name_plural = 'Detail Produksi'
 
     def save(self, *args, **kwargs):
+        # Check if this is an update to an existing record
+        is_update = self.pk is not None
+        
+        # Get the old quantity if this is an update
+        old_jumlah = 0
+        if is_update:
+            old_instance = DetailProduksi.objects.get(pk=self.pk)
+            old_jumlah = old_instance.jumlahBahanTerpakai
+            
         super().save(*args, **kwargs)
+        
+        # Adjust stock based on the difference
+        stock_difference = self.jumlahBahanTerpakai - old_jumlah
         
         # Reduce stock of raw materials
         if self.idProduk.jenisProduk == 'Bahan Baku':
-            self.idProduk.stok -= self.jumlahBahanTerpakai
+            self.idProduk.stok -= stock_difference
             self.idProduk.save()
 
     def __str__(self):
@@ -173,12 +182,7 @@ class Pembelian(models.Model):
         verbose_name_plural = 'Pembelian'
 
     def save(self, *args, **kwargs):
-        # Calculate total from details if not provided
-        if not self.totalPembelian:
-            total = self.detailpembelian_set.aggregate(
-                total=Sum('subTotal')
-            )['total'] or 0
-            self.totalPembelian = total
+        # Removed aggregation logic - will be handled in admin
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -203,11 +207,24 @@ class DetailPembelian(models.Model):
         # Calculate subtotal automatically
         if not self.subTotal:
             self.subTotal = self.idProduk.harga * self.kuantiti
+            
+        # Check if this is an update to an existing record
+        is_update = self.pk is not None
+        
+        # Get the old quantity if this is an update
+        old_kuantiti = 0
+        if is_update:
+            old_instance = DetailPembelian.objects.get(pk=self.pk)
+            old_kuantiti = old_instance.kuantiti
+            
         super().save(*args, **kwargs)
+        
+        # Adjust stock based on the difference
+        stock_difference = self.kuantiti - old_kuantiti
         
         # Increase stock when purchasing raw materials
         if self.idProduk.jenisProduk == 'Bahan Baku':
-            self.idProduk.stok += self.kuantiti
+            self.idProduk.stok += stock_difference
             self.idProduk.save()
 
     def __str__(self):
@@ -230,12 +247,7 @@ class Penjualan(models.Model):
         verbose_name_plural = 'Penjualan'
 
     def save(self, *args, **kwargs):
-        # Calculate total from details if not provided
-        if not self.totalPenjualan:
-            total = self.detailpenjualan_set.aggregate(
-                total=Sum('subTotal')
-            )['total'] or 0
-            self.totalPenjualan = total
+        # Removed aggregation logic - will be handled in admin
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -260,11 +272,24 @@ class DetailPenjualan(models.Model):
         # Calculate subtotal automatically
         if not self.subTotal:
             self.subTotal = self.idProduk.harga * self.kuantiti
+            
+        # Check if this is an update to an existing record
+        is_update = self.pk is not None
+        
+        # Get the old quantity if this is an update
+        old_kuantiti = 0
+        if is_update:
+            old_instance = DetailPenjualan.objects.get(pk=self.pk)
+            old_kuantiti = old_instance.kuantiti
+            
         super().save(*args, **kwargs)
+        
+        # Adjust stock based on the difference
+        stock_difference = self.kuantiti - old_kuantiti
         
         # Reduce stock when selling products
         if self.idProduk.jenisProduk == 'Produk Jadi':
-            self.idProduk.stok -= self.kuantiti
+            self.idProduk.stok -= stock_difference
             self.idProduk.save()
 
     def __str__(self):
