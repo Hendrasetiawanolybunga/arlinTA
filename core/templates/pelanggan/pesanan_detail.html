@@ -1,0 +1,149 @@
+{% extends 'pelanggan/pelanggan_base.html' %}
+{% load humanize %}
+
+{% block title %}Detail Pesanan #{{ pemesanan.idPemesanan }} - Mayckel Product{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'pelanggan_pesanan_riwayat' %}">Riwayat Pesanan</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detail Pesanan #{{ pemesanan.idPemesanan }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-receipt"></i> Detail Pesanan #{{ pemesanan.idPemesanan }}</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-info-circle"></i> Informasi Pesanan</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Tanggal:</strong></td>
+                        <td>{{ pemesanan.tanggalPemesanan|date:"d/m/Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            {% if pemesanan.status == 'Diproses' %}
+                                <span class="badge bg-warning">Diproses</span>
+                            {% elif pemesanan.status == 'Dikirim' %}
+                                <span class="badge bg-primary">Dikirim</span>
+                            {% elif pemesanan.status == 'Selesai' %}
+                                <span class="badge bg-success">Selesai</span>
+                            {% elif pemesanan.status == 'Dibatalkan' %}
+                                <span class="badge bg-danger">Dibatalkan</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total:</strong></td>
+                        <td>Rp {{ pemesanan.totalPemesanan|intcomma }}</td>
+                    </tr>
+                    {% if pemesanan.ongkosKirim > 0 %}
+                    <tr>
+                        <td><strong>Ongkos Kirim:</strong></td>
+                        <td>Rp {{ pemesanan.ongkosKirim|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total + Ongkir:</strong></td>
+                        <td>Rp {{ pemesanan.totalPemesanan|add:pemesanan.ongkosKirim|intcomma }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-map-marker-alt"></i> Alamat Pengiriman</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ pemesanan.alamatPengiriman|linebreaksbr }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-list"></i> Detail Item</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Kuantiti</th>
+                                <th>Harga</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in detail_items %}
+                            <tr>
+                                <td>{{ item.produk_nama }}</td>
+                                <td>{{ item.kuantiti }}</td>
+                                <td>Rp {{ item.harga|intcomma }}</td>
+                                <td>Rp {{ item.subtotal|intcomma }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-file-invoice-dollar"></i> Rincian Pembayaran</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 text-start">
+                        <h5>Subtotal Produk:</h5>
+                        <h5>Ongkos Kirim:</h5>
+                        <h4 class="mt-2">Total Pembayaran Akhir:</h4>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        {% with subtotal=pemesanan.totalPemesanan %}
+                            <h5>Rp {{ subtotal|intcomma }}</h5>
+                        {% endwith %}
+                        <h5>Rp {{ pemesanan.ongkosKirim|intcomma }}</h5>
+                        {% with total_akhir=pemesanan.totalPemesanan|add:pemesanan.ongkosKirim %}
+                            <h4 class="mt-2 text-primary">Rp {{ total_akhir|intcomma }}</h4>
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        {% if pemesanan.ongkosKirim > 0 and pemesanan.status != 'Selesai' %}
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-exclamation-triangle"></i> <strong>PENTING:</strong> Ongkos Kirim sebesar <strong>Rp {{ pemesanan.ongkosKirim|intcomma }}</strong> dibayarkan Tunai (COD) saat pesanan diterima.
+            </div>
+        {% endif %}
+        <a href="{% url 'pelanggan_pesanan_riwayat' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali ke Riwayat Pesanan
+        </a>
+    </div>
+</div>
+{% endblock %}

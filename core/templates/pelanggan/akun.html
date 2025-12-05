@@ -1,0 +1,84 @@
+{% extends 'pelanggan/pelanggan_base.html' %}
+{% load humanize %}
+
+{% block title %}Akun Saya - Mayckel Product{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-user"></i> Akun Saya</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-info-circle"></i> Informasi Akun</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="nama" class="form-label">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="nama" name="nama" value="{{ pelanggan.namaPelanggan }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ pelanggan.username }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <textarea class="form-control" id="alamat" name="alamat" rows="3" required>{{ pelanggan.alamat }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="no_telp" class="form-label">No. Telepon</label>
+                        <input type="text" class="form-control" id="no_telp" name="no_telp" value="{{ pelanggan.noTelp }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-key"></i> Ganti Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="password_lama" class="form-label">Password Lama</label>
+                        <input type="password" class="form-control" id="password_lama" name="password_lama">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_baru" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control" id="password_baru" name="password_baru">
+                    </div>
+                    <div class="mb-3">
+                        <label for="konfirmasi_password" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-control" id="konfirmasi_password" name="konfirmasi_password">
+                    </div>
+                    <button type="submit" class="btn btn-warning">Ganti Password</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-chart-line"></i> Statistik Belanja</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Total Belanja:</h6>
+                        <h3 class="text-success">Rp {{ total_belanja|intcomma }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

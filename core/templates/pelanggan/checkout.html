@@ -1,0 +1,71 @@
+{% extends 'pelanggan/pelanggan_base.html' %}
+{% load humanize %}
+
+{% block title %}Checkout - Mayckel Product{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-check-circle"></i> Checkout</h2>
+    </div>
+</div>
+
+<form method="post" action="{% url 'pelanggan_checkout' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-map-marker-alt"></i> Alamat Pengiriman</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="alamat_pengiriman" class="form-label">Alamat Lengkap</label>
+                        <textarea class="form-control" id="alamat_pengiriman" name="alamat_pengiriman" rows="4" placeholder="Masukkan alamat lengkap pengiriman..." required></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-money-bill-wave"></i> Pembayaran</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Informasi Rekening Pembayaran</label>
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Bank:</strong> BCA</p>
+                                <p class="mb-1"><strong>No. Rekening:</strong> 1234567890</p>
+                                <p class="mb-1"><strong>Atas Nama:</strong> Mayckel Product</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bukti_bayar" class="form-label">Upload Bukti Bayar</label>
+                        <input type="file" class="form-control" id="bukti_bayar" name="bukti_bayar" accept="image/*" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-receipt"></i> Ringkasan Pesanan</h5>
+                </div>
+                <div class="card-body">
+                    <h4 class="text-center mb-3">Total: Rp {{ total_keranjang|intcomma }}</h4>
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-check-circle"></i> Proses Pesanan
+                    </button>
+                    <a href="{% url 'pelanggan_keranjang_view' %}" class="btn btn-secondary w-100 mt-2">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Keranjang
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

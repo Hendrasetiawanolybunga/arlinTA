@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from core.admin import (
     report_penjualan_pdf, 

@@ -1,0 +1,114 @@
+{% extends 'pelanggan/pelanggan_base.html' %}
+{% load humanize %}
+
+{% block title %}Keranjang Belanja - Mayckel Product{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Keranjang Belanja</h2>
+    </div>
+</div>
+
+{% if cart_items %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Harga</th>
+                                <th>Kuantiti</th>
+                                <th>Subtotal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr id="cart-item-{{ item.produk_id }}">
+                                <td>
+                                    {% if item.produk_obj.foto %}
+                                    <img src="{{ item.produk_obj.foto.url }}" alt="{{ item.nama }}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                    {% endif %}
+                                    {{ item.nama }}
+                                </td>
+                                <td>Rp {{ item.harga|intcomma }}</td>
+                                <td>
+                                    <div class="input-group" style="width: 150px;">
+                                        <form method="post" action="{% url 'pelanggan_keranjang_update' %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="produk_id" value="{{ item.produk_id }}">
+                                            <input type="hidden" name="kuantiti" value="{{ item.kuantiti|add:"-1" }}">
+                                            <button class="btn btn-outline-secondary" type="submit">-</button>
+                                        </form>
+                                        <input type="number" class="form-control text-center" 
+                                               value="{{ item.kuantiti }}" 
+                                               min="1" max="{{ item.stok }}" readonly>
+                                        <form method="post" action="{% url 'pelanggan_keranjang_update' %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="produk_id" value="{{ item.produk_id }}">
+                                            <input type="hidden" name="kuantiti" value="{{ item.kuantiti|add:"1" }}">
+                                            <button class="btn btn-outline-secondary" type="submit">+</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td>Rp <span id="subtotal-{{ item.produk_id }}">{{ item.subtotal|intcomma }}</span></td>
+                                <td>
+                                    <form method="post" action="{% url 'pelanggan_keranjang_delete' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="produk_id" value="{{ item.produk_id }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus item ini dari keranjang?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <a href="{% url 'pelanggan_produk_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Lanjut Belanja
+                        </a>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h4>Total: Rp <span id="total-keranjang">{{ total_keranjang|intcomma }}</span></h4>
+                        <a href="{% url 'pelanggan_checkout_view' %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle"></i> Lanjut ke Checkout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Keranjang belanja Anda kosong.
+        </div>
+        <div class="text-center">
+            <a href="{% url 'pelanggan_produk_list' %}" class="btn btn-primary">
+                <i class="fas fa-box"></i> Lihat Produk
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // No JavaScript needed for this page anymore
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'pelanggan/pelanggan_base.html' %}
+{% load humanize %}
+
+{% block title %}Riwayat Pesanan - Mayckel Product{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Riwayat Pesanan</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-history"></i> Riwayat Pesanan</h2>
+    </div>
+</div>
+
+{% if pesanan_list %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>No. Pesanan</th>
+                                <th>Tanggal</th>
+                                <th>Subtotal</th>
+                                <th>Ongkos Kirim</th>
+                                <th>Total Akhir</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pesanan in pesanan_list %}
+                            <tr>
+                                <td>{{ pesanan.idPemesanan }}</td>
+                                <td>{{ pesanan.tanggalPemesanan|date:"d/m/Y" }}</td>
+                                <td>Rp {{ pesanan.totalPemesanan|intcomma }}</td>
+                                <td>Rp {{ pesanan.ongkosKirim|intcomma }}</td>
+                                {% with total_akhir=pesanan.totalPemesanan|add:pesanan.ongkosKirim %}
+                                <td>
+                                    <strong>Rp {{ total_akhir|intcomma }}</strong>
+                                    {% if pesanan.ongkosKirim > 0 and pesanan.status != 'Selesai' %}
+                                        <div class="text-danger small">(Ongkir dibayar COD)</div>
+                                    {% endif %}
+                                </td>
+                                {% endwith %}
+                                <td>
+                                    {% if pesanan.status == 'Diproses' %}
+                                        <span class="badge bg-warning">Diproses</span>
+                                    {% elif pesanan.status == 'Dikirim' %}
+                                        <span class="badge bg-primary">Dikirim</span>
+                                    {% elif pesanan.status == 'Selesai' %}
+                                        <span class="badge bg-success">Selesai</span>
+                                    {% elif pesanan.status == 'Dibatalkan' %}
+                                        <span class="badge bg-danger">Dibatalkan</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'pelanggan_pesanan_detail_html' pesanan_id=pesanan.idPemesanan %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Anda belum memiliki riwayat pesanan.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // No JavaScript needed for this page anymore
+</script>
+{% endblock %}

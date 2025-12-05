@@ -1,0 +1,76 @@
+{% extends 'pelanggan/pelanggan_base.html' %}
+{% load humanize %}
+
+{% block title %}Produk - Mayckel Product{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Produk</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-box"></i> Daftar Produk</h2>
+    </div>
+</div>
+
+{% if produk_jadi %}
+<div class="row justify-content-center">
+    {% for produk in produk_jadi %}
+    <div class="col-md-5 mb-4 d-flex">
+        <div class="card w-100 shadow product-card h-100">
+            {% if produk.foto %}
+                <img src="{{ produk.foto.url }}" class="card-img-top" alt="{{ produk.namaProduk }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-image fa-3x text-muted"></i>
+                </div>
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ produk.namaProduk }}</h5>
+                <p class="card-text">Stok: {{ produk.stok|intcomma }} {{ produk.satuan }}</p>
+                <p class="card-text">Harga: Rp {{ produk.harga|intcomma }}</p>
+                {% if produk.deskripsi %}
+                    <p class="card-text text-muted">{{ produk.deskripsi|truncatewords:15 }}</p>
+                {% endif %}
+                <div class="mt-auto">
+                    <form method="post" action="{% url 'pelanggan_keranjang_add' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="produk_id" value="{{ produk.idProduk }}">
+                        <input type="hidden" name="kuantiti" value="1">
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fas fa-shopping-cart"></i> Tambah ke Keranjang
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Tidak ada produk yang tersedia saat ini.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle add to cart form submissions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add confirmation for add to cart
+        document.querySelectorAll('form[action="{% url 'pelanggan_keranjang_add' %}"]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                // Optionally add confirmation here
+            });
+        });
+    });
+</script>
+{% endblock %}

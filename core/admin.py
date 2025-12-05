@@ -156,12 +156,26 @@ class PelangganAdmin(admin.ModelAdmin):
 
 @admin.register(Pemesanan, site=custom_admin_site)
 class PemesananAdmin(admin.ModelAdmin):
-    list_display = ( 'tanggalPemesanan', 'formatted_totalPemesanan', 'idPelanggan', 'status', 'aksi_ikon')  # Ganti kolom aksi lama dengan ini
+    list_display = ( 'tanggalPemesanan', 'formatted_totalPemesanan', 'idPelanggan', 'status', 'formatted_ongkosKirim', 'bukti_bayar_thumbnail')  # Ganti kolom aksi lama dengan ini
     search_fields = ('idPelanggan__namaPelanggan',)
     list_filter = ('tanggalPemesanan', 'idPelanggan', 'status')
     ordering = ('-tanggalPemesanan',)
-    readonly_fields = ('totalPemesanan',)
+    readonly_fields = ('totalPemesanan', 'bukti_bayar_thumbnail')
     inlines = [DetailPemesananInline]
+    fieldsets = (
+        ('Informasi Dasar', {
+            'fields': ('idPelanggan', 'tanggalPemesanan', 'status')
+        }),
+        ('Rincian Pengiriman', {
+            'fields': ('alamatPengiriman', 'ongkosKirim')
+        }),
+        ('Pembayaran', {
+            'fields': ('buktiBayar', 'bukti_bayar_thumbnail')
+        }),
+        ('Total', {
+            'fields': ('totalPemesanan',)
+        }),
+    )
     
     # Define statuses that trigger stock reduction
     STOCK_REDUCTION_STATUSES = ['Diproses', 'Dikirim', 'Selesai']
@@ -169,6 +183,20 @@ class PemesananAdmin(admin.ModelAdmin):
     def formatted_totalPemesanan(self, obj):
         return f"Rp {obj.totalPemesanan:,}"
     formatted_totalPemesanan.short_description = 'Total Pemesanan'
+    
+    def formatted_ongkosKirim(self, obj):
+        return f"Rp {obj.ongkosKirim:,}"
+    formatted_ongkosKirim.short_description = 'Ongkos Kirim'
+    
+    def bukti_bayar_thumbnail(self, obj):
+        if obj.buktiBayar:
+            return format_html(
+                '<a href="{}" target="_blank"><img src="{}" style="width: 150px; height:auto;" /></a>',
+                obj.buktiBayar.url,
+                obj.buktiBayar.url
+            )
+        return "Tidak ada bukti bayar"
+    bukti_bayar_thumbnail.short_description = 'Bukti Pembayaran'
     
     @admin.display(description='Aksi')
     def aksi_ikon(self, obj):

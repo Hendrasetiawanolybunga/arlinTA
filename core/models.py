@@ -35,6 +35,7 @@ class Produk(models.Model):
     harga = models.IntegerField()
     stok = models.IntegerField()
     satuan = models.CharField(max_length=20)
+    foto = models.ImageField(upload_to='produk_images/', null=True, blank=True)
 
     class Meta:
         db_table = 'produk'
@@ -205,6 +206,9 @@ class Pemesanan(models.Model):
     keterangan = models.TextField(blank=True, null=True)
     idPelanggan = models.ForeignKey(Pelanggan, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Diproses')
+    buktiBayar = models.ImageField(upload_to='bukti_pembayaran/', null=True, blank=True)
+    alamatPengiriman = models.TextField(default='Alamat belum diisi')
+    ongkosKirim = models.DecimalField(max_digits=10, decimal_places=0, default=0)  # Diisi Admin
 
     class Meta:
         db_table = 'pemesanan'
